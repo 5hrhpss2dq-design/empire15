@@ -9,10 +9,12 @@ namespace Empire15.Movement
     [RequireComponent(typeof(CharacterController))]
     public class ThirdPersonController : MonoBehaviour
     {
-        [Header("Movement Settings")]
-        [SerializeField] private float walkSpeed = 2.5f;
-        [SerializeField] private float sprintSpeed = 5.5f;
-        [SerializeField] private float crouchSpeed = 1.5f;
+        [Header("Movement Settings - PUBG Authentic Values")]
+        [SerializeField] private float walkSpeed = 1.7f;      // PUBG: 1.7 m/s
+        [SerializeField] private float runSpeed = 4.7f;       // PUBG: 4.7 m/s (default movement)
+        [SerializeField] private float sprintSpeed = 6.3f;    // PUBG: 6.3 m/s
+        [SerializeField] private float crouchWalkSpeed = 1.3f; // PUBG: 1.3 m/s
+        [SerializeField] private float crouchRunSpeed = 3.4f;  // PUBG: 3.4 m/s
         [SerializeField] private float acceleration = 10f;
         [SerializeField] private float deceleration = 15f;
         
@@ -39,6 +41,7 @@ namespace Empire15.Movement
         private Vector2 moveInput;
         private bool sprintInput;
         private bool crouchInput;
+        private bool walkInput;  // New: for slow walk mode
         private bool jumpInput;
         
         private void Awake()
@@ -62,9 +65,10 @@ namespace Empire15.Movement
             moveInput.y = Input.GetAxisRaw("Vertical");
             moveInput = moveInput.normalized;
             
-            // Get action inputs
-            sprintInput = Input.GetKey(KeyCode.LeftShift);
-            crouchInput = Input.GetKey(KeyCode.LeftControl);
+            // Get action inputs - PUBG style
+            sprintInput = Input.GetKey(KeyCode.LeftShift);  // Sprint: 6.3 m/s
+            crouchInput = Input.GetKey(KeyCode.LeftControl); // Crouch mode
+            walkInput = Input.GetKey(KeyCode.LeftAlt);      // Walk mode: 1.7 m/s (optional)
             jumpInput = Input.GetButtonDown("Jump");
         }
         
@@ -73,13 +77,27 @@ namespace Empire15.Movement
             // Check if grounded
             isGrounded = controller.isGrounded;
             
-            // Determine target speed based on state
+            // Determine target speed based on state - PUBG authentic values
             if (crouchInput)
-                targetSpeed = crouchSpeed;
-            else if (sprintInput && moveInput.y > 0)
-                targetSpeed = sprintSpeed;
+            {
+                // Crouch movement speeds
+                if (sprintInput && moveInput.y > 0)
+                    targetSpeed = 4.8f;  // PUBG crouch sprint: 4.8 m/s
+                else if (walkInput)
+                    targetSpeed = crouchWalkSpeed;  // 1.3 m/s
+                else
+                    targetSpeed = crouchRunSpeed;   // 3.4 m/s (default crouch)
+            }
             else
-                targetSpeed = walkSpeed;
+            {
+                // Standing movement speeds
+                if (sprintInput && moveInput.y > 0)
+                    targetSpeed = sprintSpeed;  // 6.3 m/s
+                else if (walkInput)
+                    targetSpeed = walkSpeed;    // 1.7 m/s
+                else
+                    targetSpeed = runSpeed;     // 4.7 m/s (default movement)
+            }
             
             // If no input, target speed is zero
             if (moveInput.magnitude == 0)
@@ -159,8 +177,9 @@ namespace Empire15.Movement
         
         // Public getters for other systems
         public bool IsMoving => currentSpeed > 0.1f;
-        public bool IsSprinting => sprintInput && currentSpeed > walkSpeed;
+        public bool IsSprinting => sprintInput && currentSpeed > runSpeed;
         public bool IsCrouching => crouchInput;
+        public bool IsWalking => walkInput;
         public Vector3 Velocity => currentMovement;
     }
 }

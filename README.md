@@ -29,17 +29,22 @@ Spawn → Move → Capture Zone → Zone Changes Color → Timer Updates → Rep
 
 ### Layer 1: TPS Movement & Camera
 
-**PUBG-Like Smooth Controls:**
-- **Movement**: WASD keys with smooth acceleration/deceleration
-- **Sprint**: Hold Left Shift while moving forward
-- **Crouch**: Hold Left Control for slower, tactical movement
+**PUBG-Authentic Movement System:**
+- **Run (Default)**: WASD movement at 4.7 m/s - standard PUBG movement speed
+- **Sprint**: Hold Left Shift + W for 6.3 m/s - fastest movement
+- **Walk**: Hold Left Alt + WASD for 1.7 m/s - slow, tactical movement
+- **Crouch Run**: Hold Left Ctrl + WASD for 3.4 m/s
+- **Crouch Sprint**: Hold Ctrl + Shift + W for 4.8 m/s
+- **Crouch Walk**: Hold Ctrl + Alt + WASD for 1.3 m/s
 - **Jump**: Spacebar
 - **Camera**: Mouse to look around with smooth interpolation
 - **Zoom**: Mouse scroll wheel to adjust camera distance
 
+*All movement speeds match official PUBG values for authentic gameplay feel.*
+
 **Scripts:**
-- `TPSCharacterController.cs` - Character movement and input handling
-- `TPSCameraController.cs` - Smooth third-person camera with collision detection
+- `ThirdPersonController.cs` - Character movement with authentic PUBG speeds
+- `CameraController.cs` - Smooth third-person camera with collision detection
 
 ### Layer 2: Core Game Loop
 
@@ -166,18 +171,21 @@ Packages/             # Unity package dependencies
 
 ### Controls
 
-| Input | Action |
-|-------|--------|
-| WASD | Move |
-| Mouse | Look around |
-| Shift | Sprint |
-| Ctrl | Crouch |
-| Space | Jump |
-| Mouse Scroll | Zoom camera |
-| Right Mouse Button + Drag | Draw path (Leader only) |
-| C | Clear all paths |
-| R | Toggle role (Soldier/Leader) |
-| Esc | Toggle cursor lock |
+| Input | Action | Speed (PUBG Authentic) |
+|-------|--------|------------------------|
+| WASD | Move (Run) | 4.7 m/s |
+| Mouse | Look around | - |
+| Shift + W | Sprint | 6.3 m/s |
+| Alt + WASD | Walk (Slow) | 1.7 m/s |
+| Ctrl + WASD | Crouch Run | 3.4 m/s |
+| Ctrl + Shift + W | Crouch Sprint | 4.8 m/s |
+| Ctrl + Alt + WASD | Crouch Walk | 1.3 m/s |
+| Space | Jump | - |
+| Mouse Scroll | Zoom camera | - |
+| Right Mouse Button + Drag | Draw path (Leader only) | - |
+| C | Clear all paths | - |
+| R | Toggle role (Soldier/Leader) | - |
+| Esc | Toggle cursor lock | - |
 
 ---
 
