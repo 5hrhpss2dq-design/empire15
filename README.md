@@ -215,6 +215,29 @@ Potential additions (not in current scope):
 - **Rendering**: Compatible with Built-in, URP, and HDRP render pipelines
 - **Performance**: Optimized for 60+ FPS on mid-range hardware
 
+### PlayFab & Photon Configuration (Placeholders)
+
+This prototype includes placeholder integration points for PlayFab and Photon networking. **No credentials are committed to the repository.**
+
+**To configure PlayFab:**
+1. Create a PlayFab account at [playfab.com](https://playfab.com)
+2. Create a new title and obtain your Title ID
+3. In Unity, select GameManagers GameObject
+4. In PlayFabAuthManager component, replace "PLACEHOLDER_TITLEID" with your actual Title ID
+5. Install PlayFab SDK from Unity Package Manager or Asset Store
+
+**To configure Photon:**
+1. Create a Photon account at [photonengine.com](https://www.photonengine.com)
+2. Create a new Photon PUN app and obtain your App ID
+3. Install Photon PUN 2 from Unity Asset Store
+4. In Photon settings, enter your App ID
+5. Implement network synchronization for multiplayer (not in current scope)
+
+**Important**: Never commit credentials to source control. Use:
+- Environment variables for builds
+- Unity's Resources or StreamingAssets with .gitignore
+- Secure key management systems for production
+
 ---
 
 ## 📄 License
