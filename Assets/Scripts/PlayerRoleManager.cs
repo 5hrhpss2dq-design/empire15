@@ -17,18 +17,18 @@ namespace Empire15.Strategy
         [SerializeField] private PlayerRole currentRole = PlayerRole.Soldier;
         
         // Component references
-        private LeaderDrawingSystem drawingSystem;
-        private UI.MinimalHUD hud;
+        private LeaderDrawing drawingSystem;
+        private UI.HUDManager hud;
         
         private void Start()
         {
             // Get components
-            drawingSystem = GetComponent<LeaderDrawingSystem>();
+            drawingSystem = GetComponent<LeaderDrawing>();
             if (drawingSystem == null)
-                drawingSystem = gameObject.AddComponent<LeaderDrawingSystem>();
+                drawingSystem = gameObject.AddComponent<LeaderDrawing>();
             
             // Find HUD
-            hud = FindObjectOfType<UI.MinimalHUD>();
+            hud = FindObjectOfType<UI.HUDManager>();
             
             // Apply role
             ApplyRole();

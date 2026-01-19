@@ -1,13 +1,15 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 namespace Empire15.Strategy
 {
     /// <summary>
     /// Allows leader role to draw tactical paths that affect gameplay
     /// Drawn paths influence zone objectives and team strategy
+    /// Emits OnLineFinished event when drawing is complete
     /// </summary>
-    public class LeaderDrawingSystem : MonoBehaviour
+    public class LeaderDrawing : MonoBehaviour
     {
         [Header("Drawing Settings")]
         [SerializeField] private float drawDistance = 100f;
@@ -28,6 +30,9 @@ namespace Empire15.Strategy
         
         // Camera reference
         private Camera mainCamera;
+        
+        // Events
+        public event Action<List<Vector3>> OnLineFinished;
         
         public List<Vector3> CurrentPath => new List<Vector3>(currentPath);
         public bool IsDrawing => isDrawing;
@@ -141,7 +146,10 @@ namespace Empire15.Strategy
             {
                 drawnPaths.Add(currentPathObject);
                 
-                // Connect path to gameplay
+                // Emit OnLineFinished event
+                OnLineFinished?.Invoke(new List<Vector3>(currentPath));
+                
+                // Connect path to gameplay (legacy method, can be replaced by event handlers)
                 ConnectPathToGameplay();
                 
                 Debug.Log($"Leader finished drawing path with {currentPath.Count} points");

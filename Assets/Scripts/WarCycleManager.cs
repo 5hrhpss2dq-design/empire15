@@ -1,26 +1,32 @@
 using UnityEngine;
+using System;
 
 namespace Empire15.GameLoop
 {
     /// <summary>
     /// Manages the core game loop: Spawn → Move → Capture → Zone Changes → Timer Updates → Repeat
-    /// Controls zone activation cycle and game state
+    /// Controls zone activation cycle, game state, and compressed war cycles
     /// </summary>
-    public class GameLoopManager : MonoBehaviour
+    public class WarCycleManager : MonoBehaviour
     {
         [Header("Game Settings")]
-        [SerializeField] private float cycleDuration = 60f; // 60 seconds per cycle
+        [SerializeField] private float cycleDuration = 60f; // 60 seconds per cycle (can be compressed for testing)
         [SerializeField] private CaptureZone[] captureZones;
         
         // Singleton
-        private static GameLoopManager instance;
-        public static GameLoopManager Instance => instance;
+        private static WarCycleManager instance;
+        public static WarCycleManager Instance => instance;
         
         // Game state
         private float cycleTimer = 0f;
         private int currentCycleNumber = 1;
         private CaptureZone activeZone;
         private int activeZoneIndex = 0;
+        
+        // Events
+        public event Action OnCycleStart;
+        public event Action OnCycleEnd;
+        public event Action<CaptureZone> OnZoneOwnershipChanged;
         
         public float CycleTimer => cycleTimer;
         public float CycleDuration => cycleDuration;
@@ -38,6 +44,7 @@ namespace Empire15.GameLoop
         private void Start()
         {
             InitializeGameLoop();
+            OnCycleStart?.Invoke();
         }
         
         private void Update()
@@ -87,6 +94,9 @@ namespace Empire15.GameLoop
         /// </summary>
         public void OnZoneCaptured(CaptureZone zone)
         {
+            // Notify listeners about ownership change
+            OnZoneOwnershipChanged?.Invoke(zone);
+            
             if (zone == activeZone)
             {
                 Debug.Log($"Active zone captured! Moving to next zone...");
@@ -122,6 +132,9 @@ namespace Empire15.GameLoop
         {
             Debug.Log($"Cycle {currentCycleNumber} complete!");
             
+            // Notify listeners
+            OnCycleEnd?.Invoke();
+            
             // Reset timer
             cycleTimer = 0f;
             currentCycleNumber++;
@@ -137,6 +150,9 @@ namespace Empire15.GameLoop
             ActivateNextZone();
             
             Debug.Log($"Starting Cycle {currentCycleNumber}");
+            
+            // Notify cycle start
+            OnCycleStart?.Invoke();
         }
         
         /// <summary>

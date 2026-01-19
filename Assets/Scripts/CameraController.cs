@@ -6,7 +6,7 @@ namespace Empire15.Camera
     /// PUBG-like smooth third-person camera system
     /// Handles camera follow, rotation, and zoom with smooth interpolation
     /// </summary>
-    public class TPSCameraController : MonoBehaviour
+    public class CameraController : MonoBehaviour
     {
         [Header("Target Settings")]
         [SerializeField] private Transform target;
@@ -74,15 +74,20 @@ namespace Empire15.Camera
         
         private void HandleInput()
         {
-            // Mouse input for rotation
-            float mouseX = Input.GetAxis("Mouse X");
-            float mouseY = Input.GetAxis("Mouse Y");
+            // Mouse input for rotation - RMB to orbit
+            bool orbitMode = Input.GetMouseButton(1); // Right mouse button
             
-            targetYaw += mouseX * mouseSensitivityX;
-            targetPitch -= mouseY * mouseSensitivityY;
-            
-            // Clamp vertical rotation
-            targetPitch = Mathf.Clamp(targetPitch, minVerticalAngle, maxVerticalAngle);
+            if (orbitMode || Cursor.lockState == CursorLockMode.Locked)
+            {
+                float mouseX = Input.GetAxis("Mouse X");
+                float mouseY = Input.GetAxis("Mouse Y");
+                
+                targetYaw += mouseX * mouseSensitivityX;
+                targetPitch -= mouseY * mouseSensitivityY;
+                
+                // Clamp vertical rotation
+                targetPitch = Mathf.Clamp(targetPitch, minVerticalAngle, maxVerticalAngle);
+            }
             
             // Mouse scroll for zoom
             float scrollInput = Input.GetAxis("Mouse ScrollWheel");

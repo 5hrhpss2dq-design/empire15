@@ -4,10 +4,10 @@ using UnityEngine.UI;
 namespace Empire15.UI
 {
     /// <summary>
-    /// Minimal HUD displaying role name, cycle timer, and current zone status
-    /// Clean, military-style interface
+    /// HUD Manager displaying role name, cycle timer, and current zone status
+    /// Clean, military-style interface with event-driven updates
     /// </summary>
-    public class MinimalHUD : MonoBehaviour
+    public class HUDManager : MonoBehaviour
     {
         [Header("HUD References")]
         [SerializeField] private Text roleNameText;
@@ -21,11 +21,19 @@ namespace Empire15.UI
         [SerializeField] private Color warningColor = Color.yellow;
         [SerializeField] private Color criticalColor = Color.red;
         
-        private GameLoop.GameLoopManager gameManager;
+        private GameLoop.WarCycleManager gameManager;
         
         private void Start()
         {
-            gameManager = GameLoop.GameLoopManager.Instance;
+            gameManager = GameLoop.WarCycleManager.Instance;
+            
+            // Subscribe to events
+            if (gameManager != null)
+            {
+                gameManager.OnCycleStart += HandleCycleStart;
+                gameManager.OnCycleEnd += HandleCycleEnd;
+                gameManager.OnZoneOwnershipChanged += HandleZoneOwnershipChanged;
+            }
             
             // Set role name
             if (roleNameText != null)
@@ -34,11 +42,46 @@ namespace Empire15.UI
             }
         }
         
+        private void OnDestroy()
+        {
+            // Unsubscribe from events
+            if (gameManager != null)
+            {
+                gameManager.OnCycleStart -= HandleCycleStart;
+                gameManager.OnCycleEnd -= HandleCycleEnd;
+                gameManager.OnZoneOwnershipChanged -= HandleZoneOwnershipChanged;
+            }
+        }
+        
         private void Update()
         {
             UpdateTimer();
             UpdateZoneStatus();
             UpdateCycleNumber();
+        }
+        
+        /// <summary>
+        /// Handles cycle start event
+        /// </summary>
+        private void HandleCycleStart()
+        {
+            Debug.Log("HUD: New cycle started");
+        }
+        
+        /// <summary>
+        /// Handles cycle end event
+        /// </summary>
+        private void HandleCycleEnd()
+        {
+            Debug.Log("HUD: Cycle ended");
+        }
+        
+        /// <summary>
+        /// Handles zone ownership changed event
+        /// </summary>
+        private void HandleZoneOwnershipChanged(GameLoop.CaptureZone zone)
+        {
+            Debug.Log($"HUD: Zone {zone.ZoneName} ownership changed");
         }
         
         /// <summary>

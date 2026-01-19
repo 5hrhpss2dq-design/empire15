@@ -1,11 +1,13 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 namespace Empire15.GameLoop
 {
     /// <summary>
     /// Represents a capturable zone that players can control
     /// Changes color based on capture status
+    /// Exposes events and API for game loop integration
     /// </summary>
     public class CaptureZone : MonoBehaviour
     {
@@ -26,11 +28,17 @@ namespace Empire15.GameLoop
         private float captureProgress = 0f;
         private List<GameObject> playersInZone = new List<GameObject>();
         private Material zoneMaterial;
+        private string ownerId = "";
+        
+        // Events
+        public event Action<CaptureZone> OnCaptured;
         
         public bool IsActive => isActive;
         public bool IsCaptured => isCaptured;
+        public bool IsOwned => isCaptured && !string.IsNullOrEmpty(ownerId);
         public float CaptureProgress => captureProgress;
         public string ZoneName => zoneName;
+        public string OwnerId => ownerId;
         
         private void Awake()
         {
@@ -53,6 +61,7 @@ namespace Empire15.GameLoop
             // Update capture progress
             if (playersInZone.Count > 0)
             {
+                // Players in zone - increase progress
                 captureProgress += Time.deltaTime / captureTime;
                 captureProgress = Mathf.Clamp01(captureProgress);
                 
@@ -63,6 +72,13 @@ namespace Empire15.GameLoop
                 {
                     CompleteCapture();
                 }
+            }
+            else if (captureProgress > 0 && !isCaptured)
+            {
+                // No players in zone - regress progress slowly
+                captureProgress -= Time.deltaTime / (captureTime * 2f); // Regress at half speed
+                captureProgress = Mathf.Max(0, captureProgress);
+                UpdateZoneColor();
             }
         }
         
@@ -111,8 +127,11 @@ namespace Empire15.GameLoop
             
             Debug.Log($"{zoneName} has been captured!");
             
+            // Notify via event
+            OnCaptured?.Invoke(this);
+            
             // Notify game manager
-            GameLoopManager.Instance?.OnZoneCaptured(this);
+            WarCycleManager.Instance?.OnZoneCaptured(this);
         }
         
         /// <summary>
@@ -123,6 +142,7 @@ namespace Empire15.GameLoop
             isActive = true;
             captureProgress = 0f;
             isCaptured = false;
+            ownerId = "";
             UpdateZoneColor();
             Debug.Log($"{zoneName} is now active!");
         }
@@ -145,8 +165,39 @@ namespace Empire15.GameLoop
             isActive = false;
             isCaptured = false;
             captureProgress = 0f;
+            ownerId = "";
             playersInZone.Clear();
             UpdateZoneColor();
+        }
+        
+        /// <summary>
+        /// Force activates this zone with a specific leader ID (leader command)
+        /// </summary>
+        /// <param name="leaderId">ID of the leader forcing activation</param>
+        public void ForceActivate(string leaderId)
+        {
+            this.ownerId = leaderId;
+            this.isCaptured = true;
+            this.captureProgress = 1f;
+            this.isActive = true;
+            
+            UpdateZoneColor();
+            
+            Debug.Log($"{zoneName} force-activated by leader {leaderId}!");
+            
+            // Notify via event
+            OnCaptured?.Invoke(this);
+            
+            // Notify game manager
+            WarCycleManager.Instance?.OnZoneCaptured(this);
+        }
+        
+        /// <summary>
+        /// Gets the capture progress as a value between 0 and 1
+        /// </summary>
+        public float GetProgress01()
+        {
+            return captureProgress;
         }
         
         private void OnDrawGizmosSelected()

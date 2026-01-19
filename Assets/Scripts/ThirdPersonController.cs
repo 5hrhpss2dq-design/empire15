@@ -7,7 +7,7 @@ namespace Empire15.Movement
     /// Handles movement, rotation, and player input
     /// </summary>
     [RequireComponent(typeof(CharacterController))]
-    public class TPSCharacterController : MonoBehaviour
+    public class ThirdPersonController : MonoBehaviour
     {
         [Header("Movement Settings")]
         [SerializeField] private float walkSpeed = 2.5f;

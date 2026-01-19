@@ -41,9 +41,9 @@ namespace Empire15.Utilities
                 return;
             }
             
-            var controller = player.GetComponent<Movement.TPSCharacterController>();
+            var controller = player.GetComponent<Movement.ThirdPersonController>();
             if (controller == null)
-                Debug.LogWarning("Player missing TPSCharacterController component!");
+                Debug.LogWarning("Player missing ThirdPersonController component!");
             
             var roleManager = player.GetComponent<Strategy.PlayerRoleManager>();
             if (roleManager == null)
@@ -63,24 +63,24 @@ namespace Empire15.Utilities
                 return;
             }
             
-            var camController = cam.GetComponent<Camera.TPSCameraController>();
+            var camController = cam.GetComponent<Camera.CameraController>();
             if (camController == null)
-                Debug.LogWarning("Camera missing TPSCameraController component!");
+                Debug.LogWarning("Camera missing CameraController component!");
         }
         
         private void ValidateManagers()
         {
-            var gameManager = FindObjectOfType<GameLoop.GameLoopManager>();
+            var gameManager = FindObjectOfType<GameLoop.WarCycleManager>();
             if (gameManager == null)
-                Debug.LogWarning("No GameLoopManager found in scene!");
+                Debug.LogWarning("No WarCycleManager found in scene!");
             
             var spawnManager = FindObjectOfType<GameLoop.SpawnManager>();
             if (spawnManager == null)
                 Debug.LogWarning("No SpawnManager found in scene!");
             
-            var hud = FindObjectOfType<UI.MinimalHUD>();
+            var hud = FindObjectOfType<UI.HUDManager>();
             if (hud == null)
-                Debug.LogWarning("No MinimalHUD found in scene!");
+                Debug.LogWarning("No HUDManager found in scene!");
         }
         
         private void LogSceneSetup()
